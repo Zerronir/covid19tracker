@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import InfoBox from './InfoBox';
 import {MenuItem, FormControl, Select} from '@material-ui/core';
 import './App.css';
 
@@ -33,8 +34,9 @@ function App() {
 
     return ( 
     <div className="app">
-
+      {/*HEADER*/}
       <div className="app__header">
+        {/*Title + select country*/}
         <h1> Seguimiento Covid-19 </h1>
         <FormControl className="app__dropdown">
           <Select variant="outlined" value={country} onChange={onCountryChange}>
@@ -47,14 +49,13 @@ function App() {
         </FormControl>
       </div>
 
-        
-
-      {/*HEADER*/}
-      {/*Title + select country*/}
       
-      {/*Info box*/}
-      {/*Info box*/}
-      {/*Info box*/}
+      <div className="app__stats">
+          <InfoBox title="Casos de covid" cases={1234} total="2000"></InfoBox>
+          <InfoBox title="Recuperados" cases={1234} total="3000"></InfoBox>
+          <InfoBox title="Muertos" cases={1234} total="4000"></InfoBox>
+      </div>
+      
 
       {/*Table*/}
       {/*Graph*/}
