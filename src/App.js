@@ -7,7 +7,16 @@ import './App.css';
 function App() {
 
     const [countires, setCountries] = useState([]);
-    const [country, setCountry] = useState('worldwide') 
+    const [country, setCountry] = useState('worldwide')
+
+    useEffect(() => {
+      fetch("https://disease.sh/v3/covid-19/all")
+      .then((response) => response.json())
+      .then(data => {
+        setCountryInfo(data);
+      })
+    }, []);
+
     useEffect(() => {
       const getCountriesData = async () => {
         await fetch("https://disease.sh/v3/covid-19/countries")
@@ -34,15 +43,15 @@ function App() {
       const countryCode = event.target.value;
       
       // CountryCode => 
-      const url = countryCode === 'worldwide' ? 'https://disease.sh/v3/covid-19/countries' : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
+      const url = countryCode === 'worldwide' ? 'https://disease.sh/v3/covid-19/all' : `https://disease.sh/v3/covid-19/countries/${countryCode}`;
       
       await fetch(url)
-            .then(response => response.json())
-            .then(data => {
+            .then((response) => response.json())
+            .then((data) => {
+              setCountry(countryCode);
               setCountryInfo(data);
             });
-
-      setCountry(countryCode);
+      console.log("Info del pais >>>> " + countryInfo);
     }
 
     return ( 
@@ -61,9 +70,9 @@ function App() {
           </FormControl>
         </div>
         <div className="app__stats">
-            <InfoBox title="Casos de covid" cases={1234} total="2000"></InfoBox>
-            <InfoBox title="Recuperados" cases={1234} total="3000"></InfoBox>
-            <InfoBox title="Muertos" cases={1234} total="4000"></InfoBox>
+            <InfoBox title="Casos de covid" cases={countryInfo.todayCases} total={countryInfo.cases}></InfoBox>
+            <InfoBox title="Recuperados" cases={countryInfo.todayRecovered} total={countryInfo.recovered}></InfoBox>
+            <InfoBox title="Muertos" cases={countryInfo.todayDeaths} total={countryInfo.deaths}></InfoBox>
         </div>
         <Map></Map>
       </div>
