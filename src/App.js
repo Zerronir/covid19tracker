@@ -4,36 +4,22 @@ import InfoBox from './InfoBox';
 import Map from './Map';
 import Table from './Table';
 import LineGraph from './LineGraph';
+import numeral from 'numeral';
+import prettyPrintStat from 'chart.js';
 import {MenuItem, FormControl, Select, Card, CardContent} from '@material-ui/core';
 import './App.css';
 import 'leaflet/dist/leaflet.css';
 
 function App() {
 
-    const [countires, setCountries] = useState([]);
+    const [countries, setCountries] = useState([]);
     const [country, setCountry] = useState('worldwide')
     const [tableData, setTableData] = useState([]);
-
-    // TEST API PERSONAL
-    const [animals, setAnimalData] = useState([]);
-
-    useEffect(() => {
-      const getAnimalsData = async () => {
-        await fetch("http://localhost:8081/api/v1/animals")
-              .then((response) => response.json())
-              .then((data) => {
-                const animals = data.map((animal) => (
-                  {
-                    name: animal.pet,
-                    owner: animal.ownerName
-                  }
-                ));
-
-                setAnimalData(animals);
-              })
-      }
-      getAnimalsData();
-    }, []);
+    const [casesType, setCasesType] = useState("cases");
+    const [countryInfo, setCountryInfo] = useState({});
+    const [mapCenter, setMapCenter] = useState({lat: 34.80746, lng: -40.4796 });
+    const [mapZoom, setMapZoom] = useState(3);
+    const [mapCountries, setMapCountries] = useState([]);
 
     // Recuento de casos en el mundo
     useEffect(() => {
@@ -60,6 +46,7 @@ function App() {
 
           const sortedData = sortData(data);
           setTableData(sortedData);
+          setMapCountries(data);
           setCountries(countries); 
         })
       }
@@ -67,7 +54,7 @@ function App() {
       getCountriesData();
     }, []);
 
-    const [countryInfo, setCountryInfo] = useState({});
+    
 
 
     //OnCountryChange --> Listamos los casos por país según lo cambiamos. Por defecto listará los casos mundiales
@@ -82,8 +69,9 @@ function App() {
             .then((data) => {
               setCountry(countryCode);
               setCountryInfo(data);
+              setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+              setMapZoom(4);
             });
-      console.log("Info del pais >>>> " + countryInfo);
     }
 
     // Pintamos los resultados en el html
@@ -96,24 +84,34 @@ function App() {
             <Select variant="outlined" value={country} onChange={onCountryChange}>
               {/*Bucle por los paises*/}
               <MenuItem value="worldwide">WorldWide</MenuItem>
-              {countires.map(country => (
+              {countries.map(country => (
                 <MenuItem value={country.value}>{country.name}</MenuItem>
               ))}
             </Select>
           </FormControl>
         </div>
         <div className="app__stats">
-            <InfoBox title="Casos de covid" cases={countryInfo.todayCases} total={countryInfo.cases}></InfoBox>
-            <InfoBox title="Recuperados" cases={countryInfo.todayRecovered} total={countryInfo.recovered}></InfoBox>
-            <InfoBox title="Muertos" cases={countryInfo.todayDeaths} total={countryInfo.deaths}></InfoBox>
+        <InfoBox
+            title="Activos"
+            cases={countryInfo.todayCases}
+            total={countryInfo.cases}
+          />
+          <InfoBox
+            title="Recuperados"
+            cases={countryInfo.todayRecovered}
+            total={countryInfo.recovered}
+          />
+          <InfoBox
+            title="Muertos"
+            cases={countryInfo.todayDeaths}
+            total={countryInfo.deaths}
+        />
         </div>
-        <Map></Map>
-
-        <div>
-          {animals.map(animal => (
-            <p>Nombre: {animal.name} -- Dueño: {animal.owner}</p>
-          ))}
-        </div>
+        <Map
+          countries={mapCountries}
+          casesType={casesType}
+          center={mapCenter}
+          zoom={mapZoom}/>
 
       </div>
       
@@ -123,7 +121,7 @@ function App() {
           <Table countries={tableData} />
           
           <h3>Casos mundiales</h3>
-          <LineGraph />
+          <LineGraph casesType={casesType} />
 
         </CardContent>
       </Card>
