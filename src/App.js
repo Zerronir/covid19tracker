@@ -1,14 +1,17 @@
 import React, {useState, useEffect} from 'react';
 import InfoBox from './InfoBox';
 import Map from './Map';
-import {MenuItem, FormControl, Select, Card, CardContent, Typography} from '@material-ui/core';
+import Table from './Table';
+import {MenuItem, FormControl, Select, Card, CardContent} from '@material-ui/core';
 import './App.css';
 
 function App() {
 
     const [countires, setCountries] = useState([]);
     const [country, setCountry] = useState('worldwide')
+    const [tableData, setTableData] = useState([]);
 
+    // Recuento de casos en el mundo
     useEffect(() => {
       fetch("https://disease.sh/v3/covid-19/all")
       .then((response) => response.json())
@@ -17,6 +20,7 @@ function App() {
       })
     }, []);
 
+    // Lo usamos para listar los paises
     useEffect(() => {
       const getCountriesData = async () => {
         await fetch("https://disease.sh/v3/covid-19/countries")
@@ -28,6 +32,8 @@ function App() {
               value: country.countryInfo.iso2
             }
           ));
+
+          setTableData(data);
           setCountries(countries); 
         })
       }
@@ -38,7 +44,7 @@ function App() {
     const [countryInfo, setCountryInfo] = useState({});
 
 
-    //OnCountryChange
+    //OnCountryChange --> Listamos los casos por país según lo cambiamos. Por defecto listará los casos mundiales
     const onCountryChange = async (event) => {
       const countryCode = event.target.value;
       
@@ -54,6 +60,7 @@ function App() {
       console.log("Info del pais >>>> " + countryInfo);
     }
 
+    // Pintamos los resultados en el html
     return ( 
     <div className="app">
       <div className="app__left">
@@ -80,7 +87,9 @@ function App() {
       <Card className="app__right">
         <CardContent>
           <h3>Casos por país</h3>
+          <Table countries={tableData}>
 
+          </Table>
           <h3>Casos mundiales</h3>
         </CardContent>
       </Card>
