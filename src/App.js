@@ -1,9 +1,12 @@
 import React, {useState, useEffect} from 'react';
+import {sortData} from './util';
 import InfoBox from './InfoBox';
 import Map from './Map';
 import Table from './Table';
+import LineGraph from './LineGraph';
 import {MenuItem, FormControl, Select, Card, CardContent} from '@material-ui/core';
 import './App.css';
+import 'leaflet/dist/leaflet.css';
 
 function App() {
 
@@ -53,8 +56,10 @@ function App() {
               value: country.countryInfo.iso2
             }
           ));
+          
 
-          setTableData(data);
+          const sortedData = sortData(data);
+          setTableData(sortedData);
           setCountries(countries); 
         })
       }
@@ -115,10 +120,11 @@ function App() {
       <Card className="app__right">
         <CardContent>
           <h3>Casos por país</h3>
-          <Table countries={tableData}>
-
-          </Table>
+          <Table countries={tableData} />
+          
           <h3>Casos mundiales</h3>
+          <LineGraph />
+
         </CardContent>
       </Card>
     </div>
