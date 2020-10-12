@@ -11,6 +11,27 @@ function App() {
     const [country, setCountry] = useState('worldwide')
     const [tableData, setTableData] = useState([]);
 
+    // TEST API PERSONAL
+    const [animals, setAnimalData] = useState([]);
+
+    useEffect(() => {
+      const getAnimalsData = async () => {
+        await fetch("http://localhost:8081/api/v1/animals")
+              .then((response) => response.json())
+              .then((data) => {
+                const animals = data.map((animal) => (
+                  {
+                    name: animal.pet,
+                    owner: animal.ownerName
+                  }
+                ));
+
+                setAnimalData(animals);
+              })
+      }
+      getAnimalsData();
+    }, []);
+
     // Recuento de casos en el mundo
     useEffect(() => {
       fetch("https://disease.sh/v3/covid-19/all")
@@ -82,6 +103,13 @@ function App() {
             <InfoBox title="Muertos" cases={countryInfo.todayDeaths} total={countryInfo.deaths}></InfoBox>
         </div>
         <Map></Map>
+
+        <div>
+          {animals.map(animal => (
+            <p>Nombre: {animal.name} -- Dueño: {animal.owner}</p>
+          ))}
+        </div>
+
       </div>
       
       <Card className="app__right">
